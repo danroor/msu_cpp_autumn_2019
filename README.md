@@ -1,1 +1,1 @@
-# msu_cpp_autumn_2019
+# msu_cpp_spring_2020
