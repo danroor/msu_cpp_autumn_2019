@@ -15,7 +15,9 @@ void makeAllocator(size_t maxSize)
 
 char* alloc(size_t size)
 {
-    if (Alloc::freemem + size > Alloc::begin + Alloc::maxsz) return nullptr;
+    if (Alloc::freemem == nullptr || 
+        Alloc::freemem + size > Alloc::begin + Alloc::maxsz)
+            return nullptr;
 
     char *ptr = Alloc::freemem;
     Alloc::freemem += size;
