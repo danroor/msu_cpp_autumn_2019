@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 #endif
 

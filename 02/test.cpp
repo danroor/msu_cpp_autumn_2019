@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 #endif
 
@@ -66,7 +67,6 @@ void num3(long long n) {
     }
 
     arr[n] = '\0';
-
     cout << "Here is your string:\n" << string(arr) << endl;
 }
 
