@@ -57,13 +57,17 @@ void num3(long long n) {
     } 
 
     arr = (char *) malloc((n + 1) * sizeof(char));
-    if (arr == nullptr)
+    if (arr == nullptr) {
         cout << "Not enough memory for your array :(\n";
+        return;
+    }
     for (int i = 0; i < n; ++i) {
         arr[i] = 'a';
     }
 
     arr[n] = '\0';
+
+    cout << "Here is your string:\n" << string(arr) << endl;
 }
 
 void str1(std::string &str) {
@@ -135,8 +139,6 @@ int main()
 
     cout << "Text:\n" << string(text3) << "\n\n";
     parse(text3);
-
-    cout << "Here is your string:\n" << string(arr) << endl;
 
     return 0;
 }
