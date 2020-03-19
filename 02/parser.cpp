@@ -6,22 +6,19 @@ namespace parser {
     OnBegin beginHandler = nullptr;
     OnEnd endHandler = nullptr;
 
-    bool isnumber(const char *str)
+    bool isnumber(std::string &str)
     {
-        bool res = true;
-        if (*str == '0' && *(str + 1) != '\0') return false;
-        if (*str == '-') {
-            str++;
-            if (!*str) res = false;           
-        }
-        while(*str) {
-            if (!std::isdigit(*str)) {
-                res = false;
-                break;
-            }
-            str++;
-        }
-        return res;
+        size_t sz = str.size(), begin = 0;
+        
+        if (str[0] == '0' && sz > 1)
+            return false;
+        if (str[0] == '-') 
+            begin = 1;
+
+        for (size_t i = begin; i < sz; ++i)
+            if (!std::isdigit(str[i]))
+                return false;
+        return true;
     }
 }
 
@@ -69,71 +66,33 @@ void register_on_end_callback(OnEnd callback)
 
 void parse(const char* text)
 {
-    if (beginHandler == nullptr) {
-        std::cout << "Attention! Parser doesn't have a pre-parsing callback\n";
-    } else
+    if (beginHandler != nullptr)
         beginHandler();
 
-    unsigned int sz = 0, cnt = 0;
-    char *token = nullptr;
+    size_t sz = 0;
+    std::string token;
 
-    while (*text)
+    do
     {
-        if (std::isspace(*text) && token != nullptr) {
-            if (isnumber(token))
-                if (numHandler == nullptr) {
-                    std::cout << "Attention! Parser doesn't have a on-number callback\n";
-                    std::cout << "The following token has not been handled:\n";
-                    std::cout << std::string(token) << std::endl;
-                } else
-                    numHandler(token);
-            else
-                if (strHandler == nullptr) {
-                    std::cout << "Attention! Parser doesn't have a on-string callback\n";
-                    std::cout << "The following token has not been handled:\n";
-                    std::cout << std::string(token) << std::endl;
-                } else
-                    strHandler(token);
+        if (std::isspace(*text) || !*text) {
+            if (sz > 0) {
+                if (isnumber(token)) {
+                    if (numHandler != nullptr)
+                        numHandler(strtoll(token.c_str(), nullptr, 10));
+                }
+                else if (strHandler != nullptr)
+                        strHandler(token);
 
-            free(token);
-            token = nullptr;
-            sz = cnt = 0;
-        } else {
- 
-            if (sz == cnt) {
-                sz <<= 1;
-                sz += 2;
-                token = (char *) realloc(token, sz * sizeof(char));
+                token = "";
+                sz = 0;
             }
-
-            token[cnt++] = *text;
-            token[cnt] = '\0';
+        } else {
+            token.push_back(*text);
+            sz++;
         }
 
-        text++;
-    }
+    } while( *(text++) );
 
-    if (token != nullptr) {
-        if (isnumber(token))
-            if (numHandler == nullptr) {
-                std::cout << "Attention! Parser doesn't have a on-number callback\n";
-                std::cout << "The following token has not been handled:\n";
-                std::cout << std::string(token) << std::endl;
-            } else
-                numHandler(token);
-        else
-            if (strHandler == nullptr) {
-                std::cout << "Attention! Parser doesn't have a on-string callback\n";
-                std::cout << "The following token has not been handled:\n";
-                std::cout << std::string(token) << std::endl;
-            } else
-                strHandler(token);
-
-        free(token);
-    }
-
-    if (endHandler == nullptr) {
-        std::cout << "Attention! Parser doesn't have a post-parsing callback\n";
-    } else
+    if (endHandler != nullptr)
         endHandler();
 }

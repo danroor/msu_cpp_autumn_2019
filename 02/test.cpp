@@ -37,66 +37,59 @@ void end3() {
     cout << "Bye!\n";
 }
 
-void num1(const char *num) {
-    long long n = strtoll(num, nullptr, 10);
-
+void num1(long long n) {
     if (n < 0)
         cout << n << " is negative" << endl;
     else
         cout << "sqrt(" << n << ") = " << sqrt(n) << endl;
 }
 
-void num2(const char *num) {
-    long long n = strtoll(num, nullptr, 10);
-
+void num2(long long n) {
     cout << n << " + 1 = " << n + 1 << endl;
 }
 
 char *arr = nullptr;
 
-void num3(const char *num) {
-    long long n = strtoll(num, nullptr, 10);
+void num3(long long n) {
     if (n <= 0) {
         cout << "Positive number expected, non-positive received\n";   
         return;
     } 
 
-    arr = (char *) malloc(n * sizeof(char));
-    for (int i = 0; i < n - 1; ++i) {
+    arr = (char *) malloc((n + 1) * sizeof(char));
+    for (int i = 0; i < n; ++i) {
         arr[i] = 'a';
     }
 
-    arr[n - 1] = '\0';
+    arr[n] = '\0';
 }
 
-void str1(const char *str) {
-    cout << string(str) << ":\nThis token is not a number\n";
+void str1(std::string &str) {
+    cout << str << ":\nThis token is not a number\n";
 }
 
-void str2(const char *str) {
-    const char *old = str;
-    while(*str) {
-        if (!isalpha(*str)) {
-            cout << string(old) << ":\nThis token is not an English word\n";
+void str2(std::string &str) {
+    size_t sz = str.size();
+    for (size_t i = 0; i < sz; ++i)
+        if (!isalpha(str[i])) {
+            cout << str << ":\nThis token is not an English word\n";
             return;
         }
-        str++;
-    }
 
-    cout << string(old) << ":\nThis token is an English word\n";
+    cout << str << ":\nThis token is an English word\n";
     return;
 }
 
-void str3(const char *str) {
-    cout << string(str) << ":\nI want numbers, not strings!\n";
+void str3(std::string &str) {
+    cout << str << ":\nI want numbers, not strings!\n";
 }
 
 int main()
 {
-    const char *text1 = "Deploying torpedo in 3 2 1";
-    const char *text2 = "Qwerty 123 -78 -qwe --89 0 056 компиляция, compilation complete.";
-    const char *text3 = "Please, give me a string of 10 characters";
-    const char *text4 = "An apple a day keeps the doctor away";
+    const char *text1 = "	Deploying   torpedo in 3  2 1";
+    const char *text2 = " 	 Qwerty \n 123 -78 -qwe --89 0 056 компиляция, compilation complete.";
+    const char *text3 = "Please,     give   me  a \n\n string   of   10   characters  ";
+    const char *text4 = "An  apple  a day  keeps  the  \ndoctor  away 12";
     const char *text5 = "2 + 2 * 2 = 6";
 
     register_on_begin_callback(begin2);

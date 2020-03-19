@@ -11,8 +11,8 @@
 #define PARSER_H
 
 namespace parser {
-    using OnNumber = void (*)(const char *number);
-    using OnString = void (*)(const char *string);
+    using OnNumber = void (*)(long long n);
+    using OnString = void (*)(std::string &str);
     using OnBegin = void (*)();
     using OnEnd = void (*)();
 }
