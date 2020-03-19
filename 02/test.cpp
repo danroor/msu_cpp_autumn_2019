@@ -57,6 +57,8 @@ void num3(long long n) {
     } 
 
     arr = (char *) malloc((n + 1) * sizeof(char));
+    if (arr == nullptr)
+        cout << "Not enough memory for your array :(\n";
     for (int i = 0; i < n; ++i) {
         arr[i] = 'a';
     }
