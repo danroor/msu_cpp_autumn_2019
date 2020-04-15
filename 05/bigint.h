@@ -1,18 +1,18 @@
-#pragma once
+#ifndef BIGINT_H
+#define BIGINT_H
+
 #include <ostream>
 #include <iomanip>
 
 class BigInt
 {
-    using num = unsigned long long;
-    using sztype = unsigned int;
+    using num_t = unsigned long long;
 
-    static constexpr num NDIGITS = 18, DIGITS = 1000000000000000000;
+    static constexpr num_t NDIGITS = 18, DIGITS = 1000000000000000000;
     //10^NDIGITS (NDIGITS digits in each group)
 
-    num *number;   //array of groups of digits
-    sztype sz;     //size of number array
-
+    num_t *number;   //array of groups of digits
+    size_t sz;     //size of number array
     bool neg; //True if the number is negative
 
     int cmp(const BigInt &y) const {
@@ -33,7 +33,7 @@ class BigInt
         if (sz < y.sz) return -sign;
         if (sz > y.sz) return sign;
 
-        for (sztype i = 0; i < sz; ++i) {
+        for (size_t i = 0; i < sz; ++i) {
             if (number[sz - i - 1] < y.number[sz - i - 1]) return -sign;
             if (number[sz - i - 1] > y.number[sz - i - 1]) return sign;
         }
@@ -45,12 +45,12 @@ class BigInt
         BigInt res;
         res.neg = neg;
         res.sz = sz > y.sz ? sz : y.sz;
-        sztype min = sz < y.sz ? sz : y.sz;
+        size_t min = sz < y.sz ? sz : y.sz;
 
-        res.number = new num[res.sz + 1];
-        num carry = 0;
+        res.number = new num_t[res.sz + 1];
+        num_t carry = 0;
 
-        for (sztype i = 0; i < min; ++i) {
+        for (size_t i = 0; i < min; ++i) {
             res.number[i] = number[i] + y.number[i] + carry;
             carry = res.number[i] / DIGITS;
             res.number[i] %= DIGITS;
@@ -62,7 +62,7 @@ class BigInt
         else
             ptr = &y;
 
-        for (sztype i = min; i < res.sz; ++i) {
+        for (size_t i = min; i < res.sz; ++i) {
             res.number[i] = ptr->number[i] + carry;
             carry = res.number[i] / DIGITS;
             res.number[i] %= DIGITS;
@@ -79,10 +79,10 @@ class BigInt
         res.neg = false;
         res.sz = sz;
 
-        res.number = new num[res.sz];
+        res.number = new num_t[res.sz];
         bool borrow = false;
 
-        for (sztype i = 0; i < y.sz; ++i) {
+        for (size_t i = 0; i < y.sz; ++i) {
             if (number[i] < y.number[i] ||  (number[i] == y.number[i] && borrow)) {
                 res.number[i] = DIGITS - (borrow ? 1 : 0);
                 borrow = true;
@@ -94,7 +94,7 @@ class BigInt
             res.number[i] %= DIGITS;
         }
 
-        for (sztype i = y.sz; i < sz; ++i) {
+        for (size_t i = y.sz; i < sz; ++i) {
             if (number[i] == 0 && borrow) {
                 borrow = true;
                 res.number[i] = DIGITS - 1;
@@ -104,25 +104,28 @@ class BigInt
             }
         }
 
+        //truncate extra zeros from res.number
+        for (size_t i = 0; i < sz - 1 && res.number[sz - i - 1] == 0; ++i, --res.sz);
+
         return res;
     }
 
 public:
-    BigInt() : sz(0) {};
+    BigInt() : number(nullptr), sz(0), neg(false) {};
     ~BigInt() {
         if (sz > 0) delete [] number;
     }
 
-    BigInt(const int &x) : sz(1) {
+    BigInt(int x) : sz(1) {
         neg = x < 0;
-        number = new num[sz];
+        number = new num_t[sz];
         long long xx = x;
-        number[0] = static_cast <num> (xx >= 0 ? xx : -xx);
+        number[0] = static_cast <num_t> (xx >= 0 ? xx : -xx);
     }
 
     BigInt(const BigInt &x) : sz(x.sz), neg(x.neg) {
-        number = new num[sz];
-        for (sztype i = 0; i < sz; ++i)
+        number = new num_t[sz];
+        for (size_t i = 0; i < sz; ++i)
             number[i] = x.number[i];
     }
 
@@ -132,14 +135,17 @@ public:
 
         sz = x.sz;
         neg = x.neg;
-        number = new num[sz];
-        for (sztype i = 0; i < sz; ++i)
+        number = new num_t[sz];
+        for (size_t i = 0; i < sz; ++i)
             number[i] = x.number[i];
 
         return *this;
     }
 
-    BigInt(BigInt &&x) : number(x.number), sz(x.sz), neg(x.neg) { x.sz = 0; }
+    BigInt(BigInt &&x) : number(x.number), sz(x.sz), neg(x.neg) {
+        x.sz = 0;
+        x.number = nullptr;
+    }
 
     BigInt& operator=(BigInt &&x)
     {
@@ -149,7 +155,9 @@ public:
         sz = x.sz;
         neg = x.neg;
         number = x.number;
+
         x.sz = 0;
+        x.number = nullptr;
 
         return *this;
     }
@@ -159,7 +167,8 @@ public:
 
     BigInt operator-() const {
         auto x = BigInt(*this);
-        x.neg = !x.neg;
+        if (x.sz > 1 || x.number[0] != 0) // +0 = -0
+            x.neg = !x.neg;
         return x;
     }
 
@@ -173,118 +182,4 @@ public:
     friend std::ostream& operator<<(std::ostream &out, const BigInt &x);
 };
 
-std::ostream& operator<<(std::ostream &out, const BigInt &x) {
-    if (x.neg)
-        out << "-";
-
-    if (x.number[x.sz - 1] != 0 || x.sz == 1)
-        out << x.number[x.sz - 1];
-    for (BigInt::sztype i = 1; i < x.sz; ++i)
-        out << std::setw(BigInt::NDIGITS) << std::setfill('0') << x.number[x.sz - i - 1];
-
-    return out;
-}
-
-BigInt operator+(const BigInt&x, const BigInt &y) {
-    if (x.neg ^ y.neg) {
-        //signs do not match
-        BigInt *cpy = new BigInt;
-        *cpy = y;
-
-        cpy->neg = !y.neg; //cpy := -y
-        int cmpres = x.cmp(*cpy);
-        delete cpy; //destroy cpy and free its number array
-
-        if (y.neg) {
-            //y < 0, x >= 0
-            switch(cmpres) {
-            case -1:
-                //x < -y, |x| < |y|
-                return -y.sub_abs(x);
-
-            case 1:
-                //x > -y, |x| > |y|
-                return x.sub_abs(y);
-
-            default: //case 0:
-                return BigInt(0); //this = -y
-            }
-        } else {
-            // y >= 0, x < 0
-            switch(cmpres) {
-            case -1:
-                //x < -y, |x| > |y|
-
-                return -x.sub_abs(y);
-
-            case 1:
-                //x > -y, |x| < |y|
-                return y.sub_abs(x);
-            default: //case 0:
-                return BigInt(0); //x = -y
-            }
-        }
-    } else
-        return x.add_abs(y);
-}
-
-BigInt operator-(const BigInt &x, const BigInt &y) {
-    if (x.neg ^ y.neg) {
-        return x.add_abs(y);
-    }
-    else {
-        //signs do match
-        if (y.neg) {
-            // y < 0, x < 0
-            switch(x.cmp(y)) {
-            case -1:
-                //x < y, |x| > |y|
-                return -x.sub_abs(y);
-
-            case 1:
-                //x > y, |x| < |y|
-                return y.sub_abs(x);
-
-            default: //case 0:
-                return BigInt(0); //x = y
-            }
-        } else {
-            //y >= 0, x >= 0
-            switch(x.cmp(y)) {
-            case -1:
-                //x < y, |x| < |y|
-                return -y.sub_abs(x);
-
-            case 1:
-                //x > y, |x| > |y|
-                return x.sub_abs(y);
-
-            default: //case 0:
-                return BigInt(0); //x = y
-            }
-        }
-   }
-}
-
-bool operator==(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) == 0;
-}
-bool operator!=(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) != 0;
-}
-
-bool operator>(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) == 1;
-}
-
-bool operator>=(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) >= 0;
-}
-
-bool operator<(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) == -1;
-}
-
-bool operator<=(const BigInt &x, const BigInt &y) {
-    return x.cmp(y) <= 0;
-}
+#endif

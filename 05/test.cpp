@@ -20,6 +20,8 @@ int main()
     assert(c == k);
     assert(i == -k);
 
+    assert(j == -j); //+0 == -0
+
     assert(a != e);
     assert(i != k);
     assert(j != 1);
