@@ -1,7 +1,5 @@
 #pragma once
-#include <exception>
 #include <limits>
-#include <iterator>
 
 template <class T>
 class Allocator
