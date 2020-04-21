@@ -75,7 +75,11 @@ int main()
 
     assert(*(vi2.rbegin() + 2) == 7);
     assert(*(vi2.rend() - 2) == 0);
-    
+ 
+    try {
+        vs.reserve(89237489723894923ull);
+    } catch (...) { cout << "Exception caught" << endl; }    
+
     vs.clear();
     assert(vs.size() == 0 && vs.begin() == vs.end());
 
