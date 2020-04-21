@@ -164,7 +164,7 @@ public:
     }
     
     iterator rend() noexcept {
-        return iterator(data - 1, false);
+        return iterator(data - 1, true);
     }
 
     void push_back(T&& value) {
