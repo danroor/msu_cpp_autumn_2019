@@ -5,6 +5,15 @@
 
 using namespace std;
 
+class qq
+{
+    int x;    
+public:
+    qq() = delete;
+    qq(int xx) : x(xx) {}
+    qq(const qq &qobj) : x(qobj.get()) {}
+    int get() const { return x; }
+};
 
 int main()
 {
@@ -82,6 +91,11 @@ int main()
 
     vs.clear();
     assert(vs.size() == 0 && vs.begin() == vs.end());
+
+    Vector<qq> qv(10, qq(10));
+    assert(qv[2].get() == 10);
+    qv.reserve(100);
+    assert(qv.size() == 10 && qv.capacity() >= 100 && qv[2].get() == 10);
 
     return 0;
 }

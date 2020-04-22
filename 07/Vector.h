@@ -44,14 +44,14 @@ public:
 
 template <class T>
 class Iterator {
-    using ptr_t = T*;
-    using valconstref_t = T&;
+    using valptr_t = T*;
+    using valref_t = T&;
     using constref_t = const Iterator<T>&;
     
-    ptr_t ptr_;
+    valptr_t ptr_;
     bool reverse_;
 public:
-    explicit Iterator(ptr_t ptr, bool reverse) : ptr_(ptr), reverse_(reverse) {}
+    explicit Iterator(valptr_t ptr, bool reverse) : ptr_(ptr), reverse_(reverse) {}
 
     bool operator==(constref_t other) const {
         return ptr_ == other.ptr_;
@@ -61,7 +61,7 @@ public:
         return ptr_ != other.ptr_;
     }
 
-    valconstref_t operator*() const {
+    valref_t operator*() const {
         return *ptr_;
     }
 
@@ -135,14 +135,14 @@ class Vector
     ptr_t data;
 public:
 
-    explicit Vector() : sz(0), cap(0), alloc_(AllocT()), data(nullptr) {}
+    explicit Vector() : sz(0), cap(0), data(nullptr) {}
 
-    explicit Vector(size_t count) : sz(count), cap(count), alloc_(AllocT()) {
+    explicit Vector(size_t count) : sz(count), cap(count) {
         data = alloc_.alloc(count);
         alloc_.construct(data, count);
     }
 
-    Vector(size_t count, constref_t val) : sz(count), cap(count), alloc_(AllocT())  {
+    Vector(size_t count, constref_t val) : sz(count), cap(count) {
         data = alloc_.alloc(count);
         alloc_.construct(data, val, count);
     }
@@ -168,12 +168,12 @@ public:
     }
 
     void push_back(T&& value) {
-        this->resize(sz + 1);
-        this->data[sz - 1] = std::move(value);
+        resize(sz + 1);
+        data[sz - 1] = std::move(value);
     }
     void push_back(const T& value) {
-        this->resize(sz + 1);
-        this->data[sz - 1] = value;
+        resize(sz + 1);
+        data[sz - 1] = value;
     }
 
     void pop_back() {
@@ -188,8 +188,8 @@ public:
             return;
 
         ptr_t newdata = alloc_.alloc(count);
-        alloc_.construct(newdata, count);
-        std::copy(data, data + sz, newdata);
+        for (size_t i = 0; i < sz; ++i)
+            alloc_.construct(newdata + i, data[i], 1);
         alloc_.destroy(data, sz);
         alloc_.dealloc(data, cap);
         data = newdata;
