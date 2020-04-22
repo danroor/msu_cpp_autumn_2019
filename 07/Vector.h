@@ -205,7 +205,7 @@ public:
         }
 
         if (newsz > cap)
-            this->reserve(newsz > 2 * cap ? newsz : 2 * cap);
+            reserve(newsz > 2 * cap ? newsz : 2 * cap);
 
         alloc_.construct(data + sz, newsz - sz);
         sz = newsz;
@@ -220,7 +220,7 @@ public:
         }
 
         if (newsz > cap)
-            this->reserve(newsz > 2 * cap ? newsz : 2 * cap);
+            reserve(newsz > 2 * cap ? newsz : 2 * cap);
 
         alloc_.construct(data + sz, val, newsz - sz);
         sz = newsz;
