@@ -1,6 +1,6 @@
 #pragma once
 #include <limits>
-
+#include <iostream>
 template <class T>
 class Allocator
 {
@@ -128,6 +128,7 @@ class Vector
     using ptr_t = T*;
     using ref_t = T&;
     using constref_t = const T&;
+    using rvalref_t = T&&;
     using iterator = Iterator<T>;
 
     size_t sz, cap; //size and capacity
@@ -167,13 +168,12 @@ public:
         return iterator(data - 1, true);
     }
 
-    void push_back(T&& value) {
-        resize(sz + 1);
+    void push_back(rvalref_t value) {
+        resize(sz + 1, value); //initialize new element (class T may not have trivial constructor)
         data[sz - 1] = std::move(value);
     }
-    void push_back(const T& value) {
-        resize(sz + 1);
-        data[sz - 1] = value;
+    void push_back(constref_t value) {
+        resize(sz + 1, value);
     }
 
     void pop_back() {
