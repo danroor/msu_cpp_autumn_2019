@@ -7,9 +7,6 @@
 #include <future>
 #include <thread>
 
-#include <iostream>
-using namespace std;
-
 class ThreadPool
 {
     static constexpr size_t DEFAULT_SIZE = 10;
