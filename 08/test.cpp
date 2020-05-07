@@ -1,11 +1,13 @@
 #include <iostream>
 #include <future>
+#include <cassert>
 #include "ThreadPool.h"
 
 using namespace std;
 
 int f1(int a, int b, int c) { return a + b + c; }
 void code(char c, int *x) { *x = int(c); }
+void incr(int *a) { (*a)++; }
 
 //concatenate digits to string
 void dig_to_str(std::string &s, int x1, int x2, int x3, int x4) {
@@ -22,7 +24,7 @@ void dig_to_str(std::string &s, int x1, int x2, int x3, int x4) {
 
 int main()
 {
-    int y = 1;
+    int y = 1, t = 0;
 
     ThreadPool pool1(8), pool2;
 
@@ -37,19 +39,28 @@ int main()
     pool1.join();
     auto task4 = pool2.exec(f1, 3, 3, 3);
 
-    decltype(task1) tasks[15];
+    decltype(task1) tasks[100];
 
     ThreadPool pool3(15);
-    for (size_t i = 0; i < 15; ++i) {
+
+    auto task5 = pool3.exec(incr, &t);
+    task5.get();
+    decltype(task5) tasks2[100];
+
+
+    for (size_t i = 0; i < 100; ++i) {
         tasks[i] = pool3.exec(f1, i, i, i);
+        tasks2[i] = pool3.exec(incr, &t);
     }
 
     task2.get();
     task3.get();
 
-    for (size_t i = 0; i < 15; ++i) {
-        cout << tasks[i].get() << endl;
+    for (size_t i = 0; i < 100; ++i) {
+        assert(tasks[i].get() == 3 * i);
+        tasks2[i].get();
     }
+    assert(t == 101);
 
     cout << s << endl << y << endl << task4.get() << endl;    
 
