@@ -8,6 +8,7 @@
 #include <ctime>
 #include <tuple>
 #include <utility>
+#include <stdexcept>
 #include <algorithm>
 #include <queue>
 
