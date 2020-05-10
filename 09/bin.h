@@ -126,6 +126,10 @@ namespace bin {
         if (!fin)
             throw std::runtime_error(FILE_ERROR);
 
+        std::ofstream fout(to, OUTFLAGS);
+        if (!fout)
+            throw std::runtime_error(FILE_ERROR);
+
         size_t cnt = 0;
         std::mutex mut;
 
@@ -133,10 +137,6 @@ namespace bin {
         std::thread t2(split_data, std::ref(fin), std::ref(cnt), std::ref(mut));
         t1.join();
         t2.join();
- 
-        std::ofstream fout(to, OUTFLAGS);
-        if (!fout)
-            throw std::runtime_error(FILE_ERROR);
 
         merge_data(fout, cnt);
     }
