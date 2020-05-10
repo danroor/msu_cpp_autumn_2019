@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <cstdint>
 #include <tuple>
 #include <utility>
 #include <stdexcept>
@@ -120,7 +121,7 @@ namespace bin {
         }
     }
 
-    void sort(std::string &from, std::string &to) {
+    void sort(const std::string &from, const std::string &to) {
 
         std::ifstream fin(from, INFLAGS);
         if (!fin)
