@@ -24,7 +24,7 @@ namespace bin {
     static constexpr decltype(std::ios::in) INFLAGS  = std::ios::in  | std::ios::binary;
     static constexpr decltype(std::ios::in) OUTFLAGS = std::ios::out | std::ios::binary;
 
-    void generate_random_file(std::string &name, size_t sz) {
+    void generate_random_file(const std::string &name, size_t sz) {
         std::srand(std::time(nullptr));
         uint64_t cur;
 
