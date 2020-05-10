@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
+#include <stdexcept>
 #include "bin.h"
 
 using namespace std;
