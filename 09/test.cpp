@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdio>
 #include <stdexcept>
+#include <cstdint>
 #include "bin.h"
 
 using namespace std;
