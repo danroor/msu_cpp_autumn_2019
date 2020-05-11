@@ -45,8 +45,8 @@ public:
                     task_queue.pop();
                     Lock.unlock();
                     task();
-                } else while (alive && task_queue.empty())
-                    sync.wait(Lock);
+                } else
+                    sync.wait(Lock, [this]() {return !alive || !task_queue.empty(); } );
             }
             
         }; 
