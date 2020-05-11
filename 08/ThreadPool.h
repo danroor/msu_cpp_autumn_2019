@@ -30,9 +30,9 @@ class ThreadPool
     //void functions
     template <class Func, class... Args>
     void execTask(Func func, std::promise<void> *prom, Args... args) {
+        func(args...);
         prom->set_value();
         delete prom;
-        func(args...);
     }
 
 public:
@@ -40,14 +40,13 @@ public:
         auto doTasks = [this]() {
             while (alive) {
                 std::unique_lock <std::mutex> Lock(queue_access);
-                if (task_queue.empty()) {
+                if (!task_queue.empty()) {
+                    task_t task(std::move(task_queue.front()));
+                    task_queue.pop();
+                    Lock.unlock();
+                    task();
+                } else while (alive && task_queue.empty())
                     sync.wait(Lock);
-                    continue;
-                }
-                task_t task(std::move(task_queue.front()));
-                task_queue.pop();
-                Lock.unlock();
-                task();
             }
             
         }; 
