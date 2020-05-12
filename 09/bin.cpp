@@ -41,9 +41,8 @@ void bin::split_data(std::ifstream &fin, size_t &n_files, std::mutex &mut) {
     
     size_t rdwr_sz = sizeof(buf[0]) * BUFSZ_RD_WRT;
     size_t blocks = BUFSZ_STORE / BUFSZ_RD_WRT;
-    
-    size_t cnt, n_blocks;
-    std::streamsize size;
+
+    size_t cnt, n_blocks, size;
 
     while (true) {
         std::stringstream out;
@@ -80,7 +79,7 @@ void bin::split_data(std::ifstream &fin, size_t &n_files, std::mutex &mut) {
         size %= BUFSZ_RD_WRT;
 
         if (size > 0)
-            fout.write((char *) (buf + n_blocks * BUFSZ_RD_WRT), size);
+            fout.write((char *) (buf + n_blocks * BUFSZ_RD_WRT), size * sizeof(buf[0]));
     }
 
     delete [] buf;
