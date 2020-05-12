@@ -100,7 +100,6 @@ void bin::merge_data(std::ofstream &fout, size_t n_files) {
         files.emplace_back(strm.str(), INFLAGS);
 
         if (!files[i]) {
-            cout << "JJJ" << endl;
             files.clear();
             throw std::runtime_error(FILE_ERROR);
         }
