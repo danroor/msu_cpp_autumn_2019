@@ -1,12 +1,5 @@
 #include "bin.h"
 
-
-
-
-#include <iostream>
-using namespace std;
-
-
 void bin::generate_random_file(const std::string &name, size_t sz) {
     using namespace bin;
 
