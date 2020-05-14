@@ -51,7 +51,6 @@ void read_file(Input &in, Queue &q1, Queue &q2, Mutex &mut_push,
         else {
             q2.push(x);
         }
-        std::cout << cur  << std::endl;
     }
 
     if (first) sync1.notify_one();
