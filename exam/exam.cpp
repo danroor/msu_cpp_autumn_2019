@@ -79,7 +79,6 @@ int sum(Queue &q, Mutex &mut, sync_t &sync, sync_t &sync_push)
             res += x;
             q.pop();
         }
-        sync.wait(Lock, [&q]() { return !q.empty(); });
         sync_push.notify_one();
     }
 
